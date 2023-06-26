@@ -3,33 +3,23 @@ const axios = require('axios');
 
 const app = express();
 
-app.get('/make-request', async (req, res) => {
-    try {
-      const response = await axios.post("https://6q1kn3c1gb-dsn.algolia.net/1/indexes/prod-online-pns-products-index-popularity-asc/query?x-algolia-agent=Algolia%20for%20JavaScript%20(4.13.1)%3B%20Browser", {
-        "headers": {
-          "accept": "*/*",
-          "accept-language": "en-US,en;q=0.9",
-          "content-type": "application/x-www-form-urlencoded",
-          "sec-ch-ua": "\"Not.A/Brand\";v=\"8\", \"Chromium\";v=\"114\", \"Google Chrome\";v=\"114\"",
-          "sec-ch-ua-mobile": "?0",
-          "sec-ch-ua-platform": "\"Windows\"",
-          "sec-fetch-dest": "empty",
-          "sec-fetch-mode": "cors",
-          "sec-fetch-site": "cross-site",
-          "x-algolia-api-key": "24b2ec4024a407ce0e39419e9bc8fd38",
-          "x-algolia-application-id": "6Q1KN3C1GB",
-          "Referer": "https://www.paknsave.co.nz/",
-          "Referrer-Policy": "origin-when-cross-origin"
-        },
-        "data": "{\"query\":\"eggs\",\"facets\":[\"category2NI\",\"brand\",\"onPromotion\",\"marketinginitiatives\"],\"attributesToHighlight\":[],\"sortFacetValuesBy\":\"alpha\",\"maxValuesPerFacet\":1000,\"hitsPerPage\":5,\"page\":0,\"facetFilters\":[\"stores:e1925ea7-01bc-4358-ae7c-c6502da5ab12\",\"tobacco:false\"]}"
-      });
-  
-      res.send(response.data);
-    } catch (error) {
-      console.error(error);
-      res.status(500).send('Internal Server Error');
+let config = {
+    method: 'get',
+    maxBodyLength: Infinity,
+    url: 'https://www.newworld.co.nz/next/api/products/search?q=choclate&s=popularity&storeId=c387ac97-5e0a-43ed-9c93-f1edccda298d&publish=true&ps=10663',
+    headers: { 
+      'Cookie': '__cf_bm=IBijlAExfpq542.s8yvTd74lh2oDcfG74zxpK5oW.uQ-1687786078-0-Aak0i/WkukRgVuEQvNFQ/GxhfiCDa7JrtP0aoO5DcYRRrNr9RuWBMv6KgUdhFqY9x5xCFYllEZLcaMfisV/79Oj2kQLmIwuNp+2YsG20zfRE'
     }
+  };
+  
+  axios.request(config)
+  .then((response) => {
+    console.log(JSON.stringify(response.data));
+  })
+  .catch((error) => {
+    console.log(error);
   });
+  
 
 
   const port = 3000; // Choose a port for your server
