@@ -5,8 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node controller/scraper.js",
-    "dev": "nodemon controller/scraper.js"
+    "start": "node controller/NewWorldScraper/NewWorldScraper.js",
+    "dev": "nodemon controller/NewWorldScraper/NewWorldScraper.js"
   },
   "keywords": [],
   "author": "",
