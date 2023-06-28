@@ -18,7 +18,7 @@ async function search(storeId, {
 	}
 
 	return await fetch(url).then(r => r.json()).then(j => {
-		if('errors' in j) {
+		if ('errors' in j) {
 			const errors = j.errors.map(x => `'${x.status}: ${x.message}'`).join(", ");
 			throw new Error(`Errors occured: ${errors}`);
 		}
@@ -40,25 +40,19 @@ async function main() {
 	const storeId = "e1925ea7-01bc-4358-ae7c-c6502da5ab12"
 	const categories = await getCategories(storeId)
 
-	const allItems = new Set();
+	const categoryPromises = Object.entries(categories).map(([category, numItems]) => {
+		console.log(`Checking category '${category}'`)
 
-	Object.entries(categories).reduce(
-		(set, [category, numItems]) => {
-			console.log(`Checking category '${category}'`)
+		if (numItems > 1000) {
+			throw new Error(`Category ${category}, has more than 1000 items, and thus we cannot` +
+				` retrieve all items. Note, category has ${numItems} items`);
+		}
 
-			if (numItems > 1000) {
-				throw new Error(`Category ${category}, has more than 1000 items, and thus we cannot` +
-					` retrieve all items. Note, category has ${numItems} items`);
-			}
+		return getCategoryItems(category, storeId);
+	});
 
-			getCategoryItems(category, storeId)
-				.then(items => items.forEach(item => set.add(item)));
-			return set;
-		},
-		allItems
-	)
-
-	return allItems;
+	const categoryItems = await Promise.all(categoryPromises);
+	return new Set(categoryItems.flat())
 }
 
-main()
+const itemSet = await main()
