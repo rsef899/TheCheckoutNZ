@@ -26,14 +26,24 @@ let config = {
   }
 };
 
-axios.request(config)
-.then((response) => {
-  console.log(JSON.stringify(response.data));
-})
-.catch((error) => {
-  console.log(error);
-});
-  
+async function getallItems(){
+  try {
+    let response = await axios.request(config);
+    let data = response.data;
+    return data;
+  } catch (error){
+    console.error(`ERROR: ${error}`)
+  }
+
+}
+
+async function main(){
+  let allDataJSON = await getallItems();
+}
+
+main();
+
+
 
 
   const port = 3000; // Choose a port for your server
