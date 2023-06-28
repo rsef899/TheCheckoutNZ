@@ -32,21 +32,44 @@ async function getallItems(){
     let data = response.data;
     return data;
   } catch (error){
-    console.error(`ERROR: ${error}`)
+    console.error(`ERROR: ${error}`);
+    throw error;
   }
 
 }
 
 async function main(){
+  try {
+    let productsArray = [];
+  let id = -1;
+
   let allDataJSON = await getallItems();
+  let productsFromSearch = allDataJSON.data.products;
+  productsFromSearch.forEach(function(oneProduct){
+    let productToPush = {};
+    id++;
+    productToPush.id = id;
+    productToPush.productID = oneProduct.productId;
+    productToPush.brand = oneProduct.brand;
+    productToPush.name = oneProduct.name;
+    productToPush.price = oneProduct.price;
+    productToPush.NonloyaltyCardPrice = oneProduct.nonLoyaltyCardPrice;
+    productToPush.quanityType = oneProduct.displayName;
+
+    productsArray.push(productToPush)
+
+  });
+  
+  console.log(productsArray);
+  } catch (error){
+    console.error(`ERROR: ${error}`)
+  }
+
 }
 
 main();
 
-
-
-
-  const port = 3000; // Choose a port for your server
+const port = 3001; // Choose a port for your server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
