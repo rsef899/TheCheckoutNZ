@@ -3,16 +3,13 @@ const axios = require('axios');
 
 const app = express();
 
-let category = "Soft Drinks";
 let pages = "1";
 let numItems = "999";
 let restrictedItemBoolean = false;
 let storeId = "c387ac97-5e0a-43ed-9c93-f1edccda298d";
 
-
-
-
-
+let productsArray = [];
+let id = -1;
 
 async function fetchAllCategories(){
 
@@ -51,14 +48,15 @@ function getCategories(categoriesData){
   }
 }
 
-async function getAllItems(){
+async function fetchAllItemsOneCategory(category){
 
   let url = "https://www.newworld.co.nz/next/api/products/search?";
-  url += "category=" + category + "&";
+  url += "category=" + encodeURIComponent(category) + "&";
   url += "storeId=" + storeId + "&";
   url += "ps=" + numItems + "&";
   url += "pg=" + pages + "&";
   url += "reg=" + restrictedItemBoolean;
+
 
   let allItemsConfig = {
     method: 'get',
@@ -71,39 +69,83 @@ async function getAllItems(){
 
   try {
     let response = await axios.request(allItemsConfig);
+    console.log("this request Passed");
+    console.log(url);
     let data = response.data;
     return data;
   } catch (error){
     console.error(`ERROR: ${error}`);
+    console.log("This request failed");
+    console.log(url);
     throw error;
   }
+}
+
+let failCounter = 0;
+async function fetchAllitems(categories){
+  const maxRetries = 5;
+  let retryDelay = 2000;
+
+  for (let retryCount = 0; retryCount < maxRetries; retryCount++){
+    try{
+      // we must wait untill all the prmises from the fetch of each category is resolved
+      await Promise.all(
+        //map the fetchAllItems function to each category
+        categories.map(async (category) => {
+          let itemsFromCategory = await fetchAllItemsOneCategory(category);
+          //save the fetched items into the products array
+          getAllItems(itemsFromCategory);
+        })
+      );
+      break;
+    }catch (error){
+      console.error(`Error occurred: ${error}`);
+      if (retryCount === maxRetries - 1) {
+        console.error('Max retries exceeded. Unable to fetch all items.');
+        break;
+      }
+       // Exponential backoff - increase the delay before retrying
+       await new Promise((resolve) => setTimeout(resolve, retryDelay));
+
+       // Increase the delay for the next retry
+      retryDelay *= 2;
+
+
+    }
+  }
+
+}
+
+
+function getAllItems(allItemData){
+  try{
+    allItemData.data.products.forEach(function(oneProduct){
+      let productToPush = {};
+      id++;
+      productToPush.id = id;
+      productToPush.productID = oneProduct.productId;
+      productToPush.brand = oneProduct.brand;
+      productToPush.name = oneProduct.name;
+      productToPush.price = oneProduct.price;
+      productToPush.NonloyaltyCardPrice = oneProduct.nonLoyaltyCardPrice;
+      productToPush.quanityType = oneProduct.displayName;
+  
+      productsArray.push(productToPush)
+  
+    });
+
+  } catch(error){
+    console.error(`ERROR: ${error}`);
+  }
+
 }
 
 async function main(){
   let categoryfetchData = await fetchAllCategories();
   let categories = getCategories(categoryfetchData);
-  console.log(categories);
   try {
-  let productsArray = [];
-  let id = -1;
-
-  let allDataJSON = await getAllItems();
-  let productsFromSearch = allDataJSON.data.products;
-  productsFromSearch.forEach(function(oneProduct){
-    let productToPush = {};
-    id++;
-    productToPush.id = id;
-    productToPush.productID = oneProduct.productId;
-    productToPush.brand = oneProduct.brand;
-    productToPush.name = oneProduct.name;
-    productToPush.price = oneProduct.price;
-    productToPush.NonloyaltyCardPrice = oneProduct.nonLoyaltyCardPrice;
-    productToPush.quanityType = oneProduct.displayName;
-
-    productsArray.push(productToPush)
-
-  });
-  
+  let allDataJSON = await fetchAllitems(categories);
+  console.log(productsArray.length)
   
   } catch (error){
     console.error(`ERROR: ${error}`)
