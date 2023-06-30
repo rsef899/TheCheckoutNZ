@@ -121,12 +121,55 @@ function normaliseItem(item){
   return product;
 }
 
+function checkForDupes(allData) {
+  allData.forEach(function(item, index) {
+    let count = 0;
+    for (let i = index + 1; i < allData.length; i++) {
+      if (item.name === allData[i].name && item.price === allData[i].price) {
+        console.log(`items are ${item.name} , id= ${item.id} and ${allData[i].name}, id= ${allData[i].id}`)
+        count++;
+      }
+    }
+    if (count > 0) {
+      console.log(`Duplicate found: ${item}`);
+    }
+  });
+}
+
+function writeToJson(allDataJSON){
+
+  try{
+    //convert data 2 a string, with 2 indenting
+    const jsonData = JSON.stringify(allDataJSON, null, 2); // Convert the JSON object to a formatted string
+
+    //import file system module
+    const fs = require('fs');
+
+    //write to file
+    fs.writeFile('C:/Users/schoo/OneDrive/Desktop/items.json', jsonData, 'utf8', (err) => {
+      if (err) {
+        console.error('Error writing JSON file:', err);
+      } else {
+        console.log('JSON file has been written successfully.');
+      }
+    });
+
+  }catch (error){
+    console.error(`ERROR: ${error}`)
+  }
+
+  
+}
+
 async function main(){
   let categoryfetchData = await fetchAllCategories();
   let categories = getCategories(categoryfetchData);
   try {
     let allDataJSON = await fetchAllitems(categories);
     console.log(allDataJSON);
+    checkForDupes(allDataJSON);
+
+
   } catch (error){
     console.error(`ERROR: ${error}`)
   }
