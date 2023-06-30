@@ -78,13 +78,17 @@ async function fetchAllitems(categories){
     // Setup a delay between initial requests
     await new Promise(resolve => setTimeout(resolve, index * REQUEST_DELAY_SEP));
 
+    let retrySeparation = 1000;
     for(let i = 0; i < MAX_RETRIES; i++) {
       try {
-      console.log(`Sending request for items in category ${cat}`)
+        console.log(`Sending request for items in category ${cat}`)
         return await fetchAllItemsOneCategory(cat);
       } catch {
         console.warn(`Failed to fetch items for category ${cat}, retrying (attempt ${i + 2}/${MAX_RETRIES})`)
       }
+
+      await new Promise(resolve => setTimeout(resolve, retrySeparation));
+      retrySeparation *= 2;
     }
   }));
 
