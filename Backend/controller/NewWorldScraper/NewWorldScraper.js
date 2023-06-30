@@ -64,6 +64,9 @@ async function fetchAllItemsOneCategory(category){
 
   let response = await axios.request(allItemsConfig);
   let data = response.data;
+  data.data.products.forEach(function(product){
+    product.category = category;
+  });
   return data;
 }
 
@@ -74,24 +77,31 @@ async function fetchAllitems(categories){
   const MAX_RETRIES = 10;
   const REQUEST_DELAY_SEP = 150;
 
+  //results is an array of resolved promises, and must await all promises set within it
   let res = await Promise.all(categories.map(async (cat, index) => {
     // Setup a delay between initial requests
     await new Promise(resolve => setTimeout(resolve, index * REQUEST_DELAY_SEP));
 
+    //retry if request has failed
     let retrySeparation = 1000;
     for(let i = 0; i < MAX_RETRIES; i++) {
       try {
         console.log(`Sending request for items in category ${cat}`)
+        //return a promise
         return await fetchAllItemsOneCategory(cat);
       } catch {
         console.warn(`Failed to fetch items for category ${cat}, retrying (attempt ${i + 2}/${MAX_RETRIES})`)
       }
 
+      //Set timer for re-request if request failed, promise wait for promise to be resolved
       await new Promise(resolve => setTimeout(resolve, retrySeparation));
+      //increase retry time
       retrySeparation *= 2;
     }
   }));
 
+  //combine all products from all category searches into one array
+  //flat combines all into one array
   return res.flatMap(res => res.data.products.map(normaliseItem));
 }
 
@@ -102,6 +112,7 @@ function normaliseItem(item){
     productID: item.productId,
     brand: item.brand,
     name: item.name,
+    category: item.category,
     price: item.price,
     nonLoyaltyCardPrice: item.nonLoyaltyCardPrice,
     quanityType: item.displayName
