@@ -8,7 +8,6 @@ let numItems = "999";
 let restrictedItemBoolean = false;
 let storeId = "c387ac97-5e0a-43ed-9c93-f1edccda298d";
 
-let productsArray = [];
 let id = -1;
 
 async function fetchAllCategories(){
@@ -19,11 +18,8 @@ async function fetchAllCategories(){
 
   let allCategoriesConfig = {
     method: 'get',
-    maxBodyLength: Infinity,
-    url: url,
-    headers: { 
-      'Cookie': '__cf_bm=mSagMqawJXFKGXyGlx3F.PjlC8JQXz.leHE1tODhuGM-1687867900-0-AYsGTN7Y0dvsC1RuU3cBYA79kKdgWyoz6+f6sOvtXQwq1LfNM+6vZpvUI1a+ZaiyoL25uJhHBp3b5HSu0SkUw6T8ZmnfVopd/yu+ep3F4W7L'
-    }
+    maxBodyLength: 1024 * 1024 * 512, // Limit to 512MB
+    url: url
   };
 
   try {
@@ -38,16 +34,18 @@ async function fetchAllCategories(){
 }
 
 function getCategories(categoriesData){
-  let categories = [];
-  
   try{
-    categories = Object.keys(categoriesData.data.facets.categories);
+    let categories = Object.keys(categoriesData.data.facets.categories);
     return categories;
-  }catch (error){
+  } catch (error){
     console.error(`ERROR: ${error}`)
   }
 }
-
+/**
+ * 
+ * @param {String} category 
+ * @returns {Object}
+ */
 async function fetchAllItemsOneCategory(category){
 
   let url = "https://www.newworld.co.nz/next/api/products/search?";
@@ -60,93 +58,60 @@ async function fetchAllItemsOneCategory(category){
 
   let allItemsConfig = {
     method: 'get',
-    maxBodyLength: Infinity,
+    maxBodyLength: 1024 * 1024 * 512,
     url: url,
-    headers: { 
-      'Cookie': '__cf_bm=mSagMqawJXFKGXyGlx3F.PjlC8JQXz.leHE1tODhuGM-1687867900-0-AYsGTN7Y0dvsC1RuU3cBYA79kKdgWyoz6+f6sOvtXQwq1LfNM+6vZpvUI1a+ZaiyoL25uJhHBp3b5HSu0SkUw6T8ZmnfVopd/yu+ep3F4W7L'
-    }
   };
 
-  try {
-    let response = await axios.request(allItemsConfig);
-    console.log("this request Passed");
-    console.log(url);
-    let data = response.data;
-    return data;
-  } catch (error){
-    console.error(`ERROR: ${error}`);
-    console.log("This request failed");
-    console.log(url);
-    throw error;
-  }
+  let response = await axios.request(allItemsConfig);
+  let data = response.data;
+  return data;
 }
 
-let failCounter = 0;
+/**
+ * @param {Array<String>} categories 
+ */
 async function fetchAllitems(categories){
-  const maxRetries = 5;
-  let retryDelay = 2000;
+  const MAX_RETRIES = 10;
+  const REQUEST_DELAY_SEP = 150;
 
-  for (let retryCount = 0; retryCount < maxRetries; retryCount++){
-    try{
-      // we must wait untill all the prmises from the fetch of each category is resolved
-      await Promise.all(
-        //map the fetchAllItems function to each category
-        categories.map(async (category) => {
-          let itemsFromCategory = await fetchAllItemsOneCategory(category);
-          //save the fetched items into the products array
-          getAllItems(itemsFromCategory);
-        })
-      );
-      break;
-    }catch (error){
-      console.error(`Error occurred: ${error}`);
-      if (retryCount === maxRetries - 1) {
-        console.error('Max retries exceeded. Unable to fetch all items.');
-        break;
+  let res = await Promise.all(categories.map(async (cat, index) => {
+    // Setup a delay between initial requests
+    await new Promise(resolve => setTimeout(resolve, index * REQUEST_DELAY_SEP));
+
+    for(let i = 0; i < MAX_RETRIES; i++) {
+      try {
+      console.log(`Sending request for items in category ${cat}`)
+        return await fetchAllItemsOneCategory(cat);
+      } catch {
+        console.warn(`Failed to fetch items for category ${cat}, retrying (attempt ${i + 2}/${MAX_RETRIES})`)
       }
-       // Exponential backoff - increase the delay before retrying
-       await new Promise((resolve) => setTimeout(resolve, retryDelay));
-
-       // Increase the delay for the next retry
-      retryDelay *= 2;
-
-
     }
-  }
+  }));
 
+  return res.flatMap(res => res.data.products.map(normaliseItem));
 }
 
 
-function getAllItems(allItemData){
-  try{
-    allItemData.data.products.forEach(function(oneProduct){
-      let productToPush = {};
-      id++;
-      productToPush.id = id;
-      productToPush.productID = oneProduct.productId;
-      productToPush.brand = oneProduct.brand;
-      productToPush.name = oneProduct.name;
-      productToPush.price = oneProduct.price;
-      productToPush.NonloyaltyCardPrice = oneProduct.nonLoyaltyCardPrice;
-      productToPush.quanityType = oneProduct.displayName;
+function normaliseItem(item){
+  let product = {
+    id: ++id,
+    productID: item.productId,
+    brand: item.brand,
+    name: item.name,
+    price: item.price,
+    nonLoyaltyCardPrice: item.nonLoyaltyCardPrice,
+    quanityType: item.displayName
+  };
   
-      productsArray.push(productToPush)
-  
-    });
-
-  } catch(error){
-    console.error(`ERROR: ${error}`);
-  }
-
+  return product;
 }
 
 async function main(){
   let categoryfetchData = await fetchAllCategories();
   let categories = getCategories(categoryfetchData);
   try {
-  let allDataJSON = await fetchAllitems(categories);
-  console.log(productsArray.length)
-  
+    let allDataJSON = await fetchAllitems(categories);
+    console.log(allDataJSON);
   } catch (error){
     console.error(`ERROR: ${error}`)
   }
@@ -154,8 +119,3 @@ async function main(){
 }
 
 main();
-
-const port = 3001; // Choose a port for your server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
