@@ -108,17 +108,27 @@ async function fetchAllitems(categories){
 
 function normaliseItem(item){
   let product = {
-    id: ++id,
     productID: item.productId,
     brand: item.brand,
-    name: item.name,
     category: item.category,
+    name: item.name,
     price: item.price,
     nonLoyaltyCardPrice: item.nonLoyaltyCardPrice,
     quanityType: item.displayName
   };
   
   return product;
+}
+
+function filterItems(allProducts){
+  // reduce allows us to change the strucuture based on the array, in this case accumulating a new map
+  // the accumulator is just a map
+  // making use of the fact a map can only have unique keys, so every repeated product ID, only one version will be stored
+  //.values() does not return teh value, it returns an iterator containing the values
+  //to return teh value we use the ... oeprator to get the values inside the itterator
+  const noDuplicates = [...allProducts.reduce((map,item) => map.set(item.productID, item),new Map()).values()];
+  return noDuplicates;
+
 }
 
 function checkForDupes(allData) {
@@ -166,8 +176,9 @@ async function main(){
   let categories = getCategories(categoryfetchData);
   try {
     let allDataJSON = await fetchAllitems(categories);
-    console.log(allDataJSON);
-    checkForDupes(allDataJSON);
+    let filteredDataJSON = filterItems(allDataJSON);
+    writeToJson(filteredDataJSON);
+    
 
 
   } catch (error){
