@@ -59,7 +59,8 @@ async function getItems(category,page) {
     url.searchParams.set("size",size);
     url.searchParams.set("page",page);
     try {
-        await new Promise(r => setTimeout(r,1000));
+        // Delay of 150 ms
+        await new Promise(r => setTimeout(r,150));
         let response = await axios.request(config)
 
         jObj = JSON.parse(JSON.stringify(response.data));
@@ -106,7 +107,7 @@ async function main() {
                 
                 if (items.length != 0) {
                     categoryItems.push(items);
-                    totalItems = categoryItems.length;
+                    totalItems = categoryItems.flat().length;
                     console.log(`Category: ${categoryName} . Total Items currently: ${totalItems} Required: ${totalReq}`);
                        
                 } else {
@@ -123,12 +124,13 @@ async function main() {
             
         }
         console.log(`Finished ${categoryName}`);
-        listItems.push(categoryItems);
+        listItems.push(categoryItems.flat());
 
     }
 
     console.log("Main complete");
-    fs.writeFileSync("countdown.json",JSON.stringify(listItems));
+    let itemSet = new Set(listItems.flat());
+    fs.writeFileSync("countdown.json",JSON.stringify(Array.from(itemSet)));
 
 }
 main();
