@@ -1,14 +1,9 @@
-const express = require('express');
 const axios = require('axios');
-
-const app = express();
 
 let pages = "1";
 let numItems = "999";
 let restrictedItemBoolean = false;
-let storeId = "c387ac97-5e0a-43ed-9c93-f1edccda298d";
-
-let id = -1;
+let initialStoreId = "c387ac97-5e0a-43ed-9c93-f1edccda298d";
 
 async function fetchAllStores(){
   let url = "https://www.newworld.co.nz/CommonApi/Store/GetStoreList";
@@ -48,7 +43,7 @@ async function fetchAllCategories(){
 
   //set the url to just get categories only store id is needed
   let url = "https://www.newworld.co.nz/next/api/products/search?";
-  url += "storeId=" + storeId + "&";
+  url += "storeId=" + initialStoreId + "&";
 
   let allCategoriesConfig = {
     method: 'get',
@@ -140,7 +135,7 @@ async function fetchAllitems(categories, stores){
       //combine all products from all category searches into one array
       //flat combines all into one array
       let productsOneCategory = filterItems(res.flatMap(res => res.data.products.map(normaliseItem)));
-      itemsAllStores[store.id] = products;
+      itemsAllStores[store.id] = productsOneCategory;
     }));
     return itemsAllStores;
 
@@ -148,8 +143,6 @@ async function fetchAllitems(categories, stores){
   //results is an array of resolved promises, and must await all promises set within it
 
 }
-
-
 
 function normaliseItem(item){
   let product = {
@@ -177,21 +170,25 @@ function filterItems(allProducts){
 }
 
 function checkForDupes(allData) {
-  allData.forEach(function(item, index) {
-    let count = 0;
-    for (let i = index + 1; i < allData.length; i++) {
-      if (item.name === allData[i].name && item.price === allData[i].price) {
-        console.log(`items are ${item.name} , id= ${item.id} and ${allData[i].name}, id= ${allData[i].id}`)
-        count++;
+  for (let key in allData){
+    let checkingStore = allData[key];
+
+    checkingStore.forEach(function(item, index) {
+      let count = 0;
+      for (let i = index + 1; i < allData.length; i++) {
+        if (item.name === checkingStore[i].name && item.price === checkingStore[i].price && item.quanityType === checkingStore.quanityType) {
+          console.log(`items are ${item.name} , id= ${item.id} and ${checkingStore[i].name}, id= ${acheckingStore[i].id}`)
+          count++;
+        }
       }
-    }
-    if (count > 0) {
-      console.log(`Duplicate found: ${item}`);
-    }
-  });
+      if (count > 0) {
+        console.log(`Duplicate found: ${item}`);
+      }
+    });
+  }  
 }
 
-function writeToJson(allDataJSON){
+function writeToJson(allDataJSON, path){
 
   try{
     //convert data 2 a string, with 2 indenting
@@ -201,7 +198,7 @@ function writeToJson(allDataJSON){
     const fs = require('fs');
 
     //write to file
-    fs.writeFile('C:/Users/schoo/OneDrive/Desktop/items.json', jsonData, 'utf8', (err) => {
+    fs.writeFile(path, jsonData, 'utf8', (err) => {
       if (err) {
         console.error('Error writing JSON file:', err);
       } else {
@@ -211,9 +208,7 @@ function writeToJson(allDataJSON){
 
   }catch (error){
     console.error(`ERROR: ${error}`)
-  }
-
-  
+  } 
 }
 
 async function main(){
@@ -221,12 +216,16 @@ async function main(){
   let categories = getCategories(categoryfetchData);
   let storesFetch = await fetchAllStores();
   let stores = getAllStores(storesFetch);
+  let someStores = [stores[0], stores[1]];
+  console.log(someStores);
   try {
-    let allDataJSON = await fetchAllitems(categories, stores);
-    writeToJson(allDataJSON);
-    
+    let allDataJSON = await fetchAllitems(categories, someStores);
+    writeToJson(allDataJSON, 'items.json');
+ 
+    console.log(allDataJSON[stores[0].id].length)
+    console.log(allDataJSON[stores[1].id].length)
 
-
+    checkForDupes(allDataJSON)
   } catch (error){
     console.error(`ERROR: ${error}`)
   }
