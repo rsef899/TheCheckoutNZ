@@ -3,7 +3,6 @@ const axios = require('axios');
 var fs = require('fs');
 const app = express();
 
-const propsToKeep = ["name","barcode","brand","sku","unit","price","images"]
 /* Setting initial request settings */
 
 const target = 'browse';
@@ -66,8 +65,10 @@ async function getItems(category,page) {
         jObj = JSON.parse(JSON.stringify(response.data));
         jProducts = jObj["products"];
         totalItems = jProducts["totalItems"];
+        
     
         jProducts = jProducts.items.filter((items)=> items.type === "Product");
+        
         console.log(jProducts.length);
         return [jProducts.flat(),totalItems];
    
@@ -82,7 +83,6 @@ async function main() {
     const categories = await getCategories();
     let listItems = [];
     // Finding all items by category (then by pages in each category)
-    //const items = await Promise.all(
         for (category of categories) {
         const categoryItems = [];
         categoryName = category;
@@ -129,8 +129,24 @@ async function main() {
     }
 
     console.log("Main complete");
-    let itemSet = new Set(listItems.flat());
-    fs.writeFileSync("countdown.json",JSON.stringify(Array.from(itemSet)));
+    const newArray = listItems.flat().map((item)=> {
+        return{
+            // Only choosing to keep certain properties of each item in our list
+            name: item.name,
+            barcode: item.barcode,
+            variety: item.variety,
+            brand: item.brand,
+            sku: item.sku,
+            unit: item.unit,
+            price: item.price,
+            size: item.size
+
+
+        }
+    });
+    const uniqueItems = newArray.filter((item,index)=> newArray.indexOf(item)===index);
+
+    fs.writeFileSync("countdown.json",JSON.stringify(uniqueItems,null,2));
 
 }
 main();
