@@ -138,7 +138,19 @@ async function main() {
             brand: item.brand,
             sku: item.sku,
             unit: item.unit,
-            price: item.price,
+            price: {
+                originalPrice: item.price.originalPrice,
+                salePrice: item.price.salePrice,
+                savePrice: item.price.savePrice,
+                isClubPrice: item.price.isClubPrice,
+                isSpecial: item.price.isSpecial,
+                isNew: item.price.isNew,
+                discount: item.price.discount,
+                total: item.price.total,
+                purchasingUnitPrice: item.price.purchasingUnitPrice,
+                orderedPrice: item.price.orderedPrice,
+
+            },
             size: item.size
 
 
