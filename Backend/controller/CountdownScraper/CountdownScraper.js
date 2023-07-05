@@ -158,7 +158,7 @@ async function main() {
     });
     const uniqueItems = newArray.filter((item,index)=> newArray.indexOf(item)===index);
 
-    fs.writeFileSync("countdown.json",JSON.stringify(uniqueItems,null,2));
+    fs.writeFileSync("./controller/CountdownScraper/countdown.json",JSON.stringify(uniqueItems,null,2));
 
 }
 main();

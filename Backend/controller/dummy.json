@@ -1,0 +1,54 @@
+[
+  {
+    "name": "fresh fruit bananas yellow",
+    "barcode": "9354829000064",
+    "variety": "yellow",
+    "brand": "fresh fruit",
+    "sku": "133211",
+    "unit": "Kg",
+    "price": {
+      "originalPrice": 3.79,
+      "salePrice": 3.79,
+      "savePrice": 0,
+      "isClubPrice": false,
+      "isSpecial": false,
+      "isNew": false,
+      "discount": null,
+      "total": null,
+      "purchasingUnitPrice": null,
+      "orderedPrice": null
+    },
+    "size": {
+      "cupPrice": 0,
+      "cupMeasure": null,
+      "packageType": "loose",
+      "volumeSize": "per kg"
+    }
+  },
+  {
+    "name": "fresh vegetable broccoli head",
+    "barcode": "9414742350858",
+    "variety": "head",
+    "brand": "fresh vegetable",
+    "sku": "281082",
+    "unit": "Each",
+    "price": {
+      "originalPrice": 2.8,
+      "salePrice": 2.8,
+      "savePrice": 0,
+      "isClubPrice": false,
+      "isSpecial": false,
+      "isNew": false,
+      "discount": null,
+      "total": null,
+      "purchasingUnitPrice": null,
+      "orderedPrice": null
+    },
+    "size": {
+      "cupPrice": 0,
+      "cupMeasure": null,
+      "packageType": "each",
+      "volumeSize": null
+    }
+  }
+]
