@@ -106,7 +106,7 @@ async function fetchAllitems(categories, stores){
   
   const MAX_RETRIES = 10;
   const REQUEST_DELAY_SEP = 150;
-  let itemsAllStores = {};
+  let itemsAllStores = [];
 
 
   await Promise.all(
@@ -135,10 +135,17 @@ async function fetchAllitems(categories, stores){
       //combine all products from all category searches into one array
       //flat combines all into one array
       let productsOneCategory = filterItems(res.flatMap(res => res.data.products.map(normaliseItem)));
-      itemsAllStores[store.id] = productsOneCategory;
+      let oneStoreData = {
+        storeName: store.name,
+        storeId: store.id,
+        items: productsOneCategory
+      }
+      itemsAllStores.push(oneStoreData)
+
+      
     }));
     return itemsAllStores;
-
+    
 
   //results is an array of resolved promises, and must await all promises set within it
 
@@ -222,8 +229,8 @@ async function main(){
     let allDataJSON = await fetchAllitems(categories, someStores);
     writeToJson(allDataJSON, 'items.json');
  
-    console.log(allDataJSON[stores[0].id].length)
-    console.log(allDataJSON[stores[1].id].length)
+    console.log(allDataJSON[items].length)
+    console.log(allDataJSON[items].length)
 
     checkForDupes(allDataJSON)
   } catch (error){
