@@ -1,54 +1,147 @@
 [
-  {
-    "name": "fresh fruit bananas yellow",
-    "barcode": "9354829000064",
-    "variety": "yellow",
-    "brand": "fresh fruit",
-    "sku": "133211",
-    "unit": "Kg",
-    "price": {
-      "originalPrice": 3.79,
-      "salePrice": 3.79,
-      "savePrice": 0,
-      "isClubPrice": false,
-      "isSpecial": false,
-      "isNew": false,
-      "discount": null,
-      "total": null,
-      "purchasingUnitPrice": null,
-      "orderedPrice": null
+    
+    {   
+        "storeName": "Botany",
+        "storeID": "de5595ab-1d28-46c6-9e9a-b1c3db1af827",
+        "items": 
+            [
+                {
+                "productID": "5046542-KGM-000",
+                "barcode": "9354829000064",
+                "category": "Fresh Fruit",
+                "name": "Bananas",
+                "price": 379,
+                "nonLoyaltyCardPrice": 379,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5039995-KGM-000",
+                "category": "Fresh Fruit",
+                "barcode": "9421009640027",
+                "name": "Mandarins",
+                "price": 599,
+                "nonLoyaltyCardPrice": 599,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5046611-KGM-000",
+                "category": "Fresh Fruit",
+                "barcode": "9421009640041",
+                "name": "Navel Oranges",
+                "price": 549,
+                "nonLoyaltyCardPrice": 549,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5039977-KGM-000",
+                "category": "Fresh Fruit",
+                "name": "Gold Kiwifruit",
+                "barcode": "0267831000009",
+                "price": 399,
+                "nonLoyaltyCardPrice": 399,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5046525-KGM-000",
+                "category": "Fresh Fruit",
+                "barcode": "9346197000159",
+                "name": "Royal Gala Apples",
+                "price": 399,
+                "nonLoyaltyCardPrice": 399,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5039976-KGM-000",
+                "category": "Summer Platters",
+                "barcode": "9414742351787",
+                "name": "Green Kiwifruit",
+                "price": 229,
+                "nonLoyaltyCardPrice": 229,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5046917-KGM-000",
+                "category": "Fresh Fruit",
+                "barcode": "9419694065102",
+                "name": "Mandarins Imported",
+                "price": 999,
+                "nonLoyaltyCardPrice": 999,
+                "quanityType": "kg"
+            }
+        ]
     },
-    "size": {
-      "cupPrice": 0,
-      "cupMeasure": null,
-      "packageType": "loose",
-      "volumeSize": "per kg"
+    {
+        "storeName": "Kaikoura",
+        "storeID": "de5595ab-1d28-46c6-9e9a-b1c3db1af827",
+        "items": 
+            [
+                {
+                "productID": "5046542-KGM-000",
+                "barcode": "9354829000064",
+                "category": "Fresh Fruit",
+                "name": "Bananas",
+                "price": 300,
+                "nonLoyaltyCardPrice": 300,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5039995-KGM-000",
+                "category": "Fresh Fruit",
+                "barcode": "9421009640027",
+                "name": "Mandarins",
+                "price": 599,
+                "nonLoyaltyCardPrice": 600,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5046611-KGM-000",
+                "category": "Fresh Fruit",
+                "barcode": "9421009640041",
+                "name": "Navel Oranges",
+                "price": 250,
+                "nonLoyaltyCardPrice": 300,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5039977-KGM-000",
+                "category": "Fresh Fruit",
+                "name": "Gold Kiwifruit",
+                "barcode": "0267831000009",
+                "price": 380,
+                "nonLoyaltyCardPrice": 399,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5046525-KGM-000",
+                "category": "Fresh Fruit",
+                "barcode": "9346197000159",
+                "name": "Royal Gala Apples",
+                "price": 400,
+                "nonLoyaltyCardPrice": 400,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5039976-KGM-000",
+                "category": "Summer Platters",
+                "barcode": "9414742351787",
+                "name": "Green Kiwifruit",
+                "price": 210,
+                "nonLoyaltyCardPrice": 210,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5046917-KGM-000",
+                "category": "Fresh Fruit",
+                "barcode": "9419694065102",
+                "name": "Mandarins Imported",
+                "price": 1010,
+                "nonLoyaltyCardPrice": 1010,
+                "quanityType": "kg"
+            }
+        ]
     }
-  },
-  {
-    "name": "fresh vegetable broccoli head",
-    "barcode": "9414742350858",
-    "variety": "head",
-    "brand": "fresh vegetable",
-    "sku": "281082",
-    "unit": "Each",
-    "price": {
-      "originalPrice": 2.8,
-      "salePrice": 2.8,
-      "savePrice": 0,
-      "isClubPrice": false,
-      "isSpecial": false,
-      "isNew": false,
-      "discount": null,
-      "total": null,
-      "purchasingUnitPrice": null,
-      "orderedPrice": null
-    },
-    "size": {
-      "cupPrice": 0,
-      "cupMeasure": null,
-      "packageType": "each",
-      "volumeSize": null
-    }
-  }
+
+        
+    
+        
 ]

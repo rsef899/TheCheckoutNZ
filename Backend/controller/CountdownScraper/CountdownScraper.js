@@ -1,6 +1,6 @@
 const express = require('express');
 const axios = require('axios');
-var fs = require('fs');
+const fs = require('fs');
 const app = express();
 
 /* Setting initial request settings */
