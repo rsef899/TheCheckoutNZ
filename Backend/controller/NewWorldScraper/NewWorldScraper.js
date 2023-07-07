@@ -138,6 +138,8 @@ async function fetchAllitems(categories, stores){
       let oneStoreData = {
         storeName: store.name,
         storeId: store.id,
+        storeLatitude: store.latitude,
+        storeLongitude: store.longitude,
         items: productsOneCategory
       }
       itemsAllStores.push(oneStoreData)
@@ -229,8 +231,8 @@ async function main(){
     let allDataJSON = await fetchAllitems(categories, someStores);
     writeToJson(allDataJSON, 'items.json');
  
-    console.log(allDataJSON[items].length)
-    console.log(allDataJSON[items].length)
+    console.log(allDataJSON["items"].length)
+    console.log(allDataJSON["items"].length)
 
     checkForDupes(allDataJSON)
   } catch (error){
