@@ -1,0 +1,170 @@
+[
+    
+    {   
+        "storeName": "Sylvia Park",
+        "storeID": "60561e46-ece7-43a7-b142-9b14812586e4",
+        "storeLatitude": -37.803437,
+        "storeLongitude": 175.767623,
+        "items": 
+            [
+                {
+                "productID": "MILK-FAKE-C0DE",
+                "barcode": "94152210",
+                "category": "Dairy",
+                "name": "Anchor Milk",
+                "price": 450,
+                "nonLoyaltyCardPrice": 450,
+                "quanityType": "Each"
+            },
+            {
+                "productID": "5039995-KGM-000",
+                "category": "Fresh Fruit",
+                "barcode": "9421009640027",
+                "name": "Mandarins",
+                "price": 599,
+                "nonLoyaltyCardPrice": 599,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5046611-KGM-000",
+                "category": "Fresh Fruit",
+                "barcode": "9421009640041",
+                "name": "Navel Oranges",
+                "price": 549,
+                "nonLoyaltyCardPrice": 549,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5039977-KGM-000",
+                "category": "Fresh Fruit",
+                "name": "Gold Kiwifruit",
+                "barcode": "0267831000009",
+                "price": 399,
+                "nonLoyaltyCardPrice": 399,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5046525-KGM-000",
+                "category": "Fresh Fruit",
+                "barcode": "9346197000159",
+                "name": "Royal Gala Apples",
+                "price": 399,
+                "nonLoyaltyCardPrice": 399,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5039976-KGM-000",
+                "category": "Summer Platters",
+                "barcode": "9414742351787",
+                "name": "Green Kiwifruit",
+                "price": 229,
+                "nonLoyaltyCardPrice": 229,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5046917-KGM-000",
+                "category": "Fresh Fruit",
+                "barcode": "9419694065102",
+                "name": "Mandarins Imported",
+                "price": 999,
+                "nonLoyaltyCardPrice": 999,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "FAKE-TWO-000",
+                "category": "Shampoo and Conditioner",
+                "barcode": "9421008707578",
+                "name": "essano expertise conditioner strength & repair",
+                "price": 2000,
+                "nonLoyaltyCardPrice": 2500,
+                "quanityType": "Each"
+            },
+            {
+                "productID": "5018215-EA-000",
+                "brand": "Earthwise",
+                "barcode": "9421027310063",
+                "category": "Air Fresheners & Deodorisers",
+                "name": "Pacific Frangipani Plant Powered Air Freshener",
+                "price": 499,
+                "nonLoyaltyCardPrice": 499,
+                "quanityType": "250ml"
+              }
+        ]
+    },
+    {
+        "storeName": "Kaikoura",
+        "storeID": "3c5e3145-0767-4066-9349-6c0a1313acc5",
+        "storeLatitude": -37.803437,
+        "storeLongitude": 175.767623,
+        "items": 
+            [
+                {
+                "productID": "5046542-KGM-000",
+                "barcode": "9354829000064",
+                "category": "Fresh Fruit",
+                "name": "Bananas",
+                "price": 300,
+                "nonLoyaltyCardPrice": 300,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5039995-KGM-000",
+                "category": "Fresh Fruit",
+                "barcode": "9421009640027",
+                "name": "Mandarins",
+                "price": 599,
+                "nonLoyaltyCardPrice": 600,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5046611-KGM-000",
+                "category": "Fresh Fruit",
+                "barcode": "9421009640041",
+                "name": "Navel Oranges",
+                "price": 250,
+                "nonLoyaltyCardPrice": 300,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5039977-KGM-000",
+                "category": "Fresh Fruit",
+                "name": "Gold Kiwifruit",
+                "barcode": "0267831000009",
+                "price": 380,
+                "nonLoyaltyCardPrice": 399,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5046525-KGM-000",
+                "category": "Fresh Fruit",
+                "barcode": "9346197000159",
+                "name": "Royal Gala Apples",
+                "price": 400,
+                "nonLoyaltyCardPrice": 400,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5039976-KGM-000",
+                "category": "Summer Platters",
+                "barcode": "9414742351787",
+                "name": "Green Kiwifruit",
+                "price": 210,
+                "nonLoyaltyCardPrice": 210,
+                "quanityType": "kg"
+            },
+            {
+                "productID": "5046917-KGM-000",
+                "category": "Fresh Fruit",
+                "barcode": "9419694065102",
+                "name": "Mandarins Imported",
+                "price": 1010,
+                "nonLoyaltyCardPrice": 1010,
+                "quanityType": "kg"
+            }
+        ]
+    }
+
+        
+    
+        
+]

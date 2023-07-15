@@ -2,7 +2,9 @@
     
     {   
         "storeName": "Botany",
-        "storeID": "de5595ab-1d28-46c6-9e9a-b1c3db1af827",
+        "storeID": "c387ac97-5e0a-43ed-9c93-f1edccda298d",
+        "storeLatitude": -37.803437,
+        "storeLongitude": 175.767623,
         "items": 
             [
                 {
@@ -72,7 +74,9 @@
     },
     {
         "storeName": "Kaikoura",
-        "storeID": "de5595ab-1d28-46c6-9e9a-b1c3db1af827",
+        "storeID": "5080816d-825d-4a6e-9835-a93d986b1ee0",
+        "storeLatitude": -37.803437,
+        "storeLongitude": 175.767623,
         "items": 
             [
                 {
