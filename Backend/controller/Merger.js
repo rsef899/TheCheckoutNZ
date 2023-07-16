@@ -3,6 +3,7 @@ const fs = require('fs');
 const countdownDataset = require('./CountdownScraper/countdown.json');
 const newWorldDataset = require('./dummy.json');
 const paknsaveDataset = require('./pakdummy.json');
+const stringSimilarity = require('string-similarity');
 const mergedData = {};
 const stores = [];
 let NWUrl = new URL('https://www.newworld.co.nz/next/api/products/search?');
@@ -44,8 +45,14 @@ newWorldDataset.forEach(store => {
     });
 });
 
-// Merge items with the same barcode
+// Removing unwanted strings from the names when trying to compare the names
+function cleanString(str) {
+    const excludedWords = ["countdown", "fresh fruit", "fresh vegetable","half", "pre-ripened"];
+    const regex = new RegExp(excludedWords.join("|"), "gi");
+    return str.replace(regex, "").trim();
+}
 
+// Merge items with the same barcode
 async function mergeItems() {
     for (const item1 of countdownDataset) {
 
@@ -62,6 +69,7 @@ async function mergeItems() {
         let PaknSaveName = null;
         let productID = null;
         for (const store of newWorldDataset) {
+            
             const matchedItem = store.items.find(item2 => item2.barcode === item1.barcode);
             if (matchedItem) {
                 NewWorldName = matchedItem.name;
@@ -82,31 +90,35 @@ async function mergeItems() {
                 try {
                     // Delay of 150 ms
                     await new Promise(r => setTimeout(r,150));
+                    // Setting up system to find the best match
+                    let NWMatch = null;
+                    let NWScore = 0;
                     let response = await axios.request(NWconfig);
                     let jObj = JSON.parse(JSON.stringify(response.data));
                     
-                    let firstProduct = jObj.data.products[0];
-                    if ((((firstProduct.unitOfMeasure === "g") || (firstProduct.unitOfMeasure === "Kg")) && (item1.unit === "Kg")) || ((firstProduct.saleType === 'UNITS') && (item1.unit === 'Each'))) {
-                        NewWorldName = firstProduct.name;
-                        productID = firstProduct.productID;
+                    let firstProducts = jObj.data.products.slice(0,3);
+                    for (const product of firstProducts) {
+                        if ((((product.unitOfMeasure === "g") || (product.unitOfMeasure === "Kg")) && (item1.unit === "Kg")) || ((product.saleType === 'UNITS') && (item1.unit === 'Each'))) {
+                            
+                            const simScore = stringSimilarity.compareTwoStrings(cleanString(product.name),cleanString(item1.name));
+                            if (simScore > NWScore) {
+                                NWScore = simScore;
+                                NWMatch = product
+                            }
+                        }
+                    }
+                    if (NWScore >= 0.6) { //If the match is ~70% accurate then:
+                        NewWorldName = NWMatch.name;
+                        productID = NWMatch.productID;
+
                         if (!prices[store.storeID]) {
                             prices[store.storeID] = []; // Initialize prices[store.storeID] as an empty array
                         }
                         prices[store.storeID].push({
-                            price: firstProduct.price,
-                            nonLoyaltyCardPrice: firstProduct.nonLoyaltyCardPrice
+                            price: NWMatch.price,
+                            nonLoyaltyCardPrice: NWMatch.nonLoyaltyCardPrice
                         });
                     }
-                    NewWorldName = firstProduct.name;
-                    productID = firstProduct.productID;
-                    if (!prices[store.storeID]) {
-                        prices[store.storeID] = []; // Initialize prices[store.storeID] as an empty array
-                    }
-                    prices[store.storeID].push({
-                        price: firstProduct.price,
-                        nonLoyaltyCardPrice: firstProduct.nonLoyaltyCardPrice
-                    });
-                    
                 } catch (error) {
                     console.error(`ERROR: ${error}`);
                 }
@@ -126,30 +138,41 @@ async function mergeItems() {
                 productID = matchedItem.productID;
             } else if ((item1.brand === "fresh fruit") || (item1.brand === "fresh") || (item1.brand === "fresh vegetable")){ // If the barcode does not match and it is a fruit we now search the New World / Paknsave website
                 PakUrl.searchParams.set("storeId",store.storeID);
-
-
-                
                 PakUrl.searchParams.set("q",item1.name);
                 try {
                     // Delay of 150 ms
-
                     await new Promise(r => setTimeout(r,150));
-                    console.log("pak");
                     let response = await axios.request(Pakconfig);
                     let jObj = JSON.parse(JSON.stringify(response.data));
+                    let pakScore = 0;
+                    let pakMatch = null;
                     
-                    let firstProduct = jObj.data.products[0];
-                    if ((((firstProduct.unitOfMeasure === "g") || (firstProduct.unitOfMeasure === "Kg")) && (item1.unit === "Kg")) || ((firstProduct.saleType === 'UNITS') && (item1.unit === 'Each'))) {
-                        PaknSaveName = firstProduct.name;
-                        productID = firstProduct.productID;
+                    let firstProducts = jObj.data.products.slice(0);
+                    for (const product of firstProducts) {
+                        if ((((product.unitOfMeasure === "g") || (product.unitOfMeasure === "Kg")) && (item1.unit === "Kg")) || ((product.saleType === 'UNITS') && (item1.unit === 'Each'))) {
+                            
+                            const simScore = stringSimilarity.compareTwoStrings(cleanString(product.name),cleanString(item1.name));
+                            if (simScore > pakScore) {
+                                pakScore = simScore;
+                                pakMatch = product
+                            }
+                        }
+                    }
+                    if (pakScore >= 0.6) { //If the match is ~70% accurate then:
+                        PaknSaveName = pakMatch.name;
+                        productID = pakMatch.productID;
+
                         if (!prices[store.storeID]) {
                             prices[store.storeID] = []; // Initialize prices[store.storeID] as an empty array
                         }
                         prices[store.storeID].push({
-                            price: firstProduct.price,
-                            nonLoyaltyCardPrice: firstProduct.nonLoyaltyCardPrice
+                            price: pakMatch.price,
+                            nonLoyaltyCardPrice: pakMatch.nonLoyaltyCardPrice
                         });
                     }
+
+
+                    
                         
                     
                 } catch (error) {
