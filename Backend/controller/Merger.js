@@ -4,7 +4,7 @@ const countdownDataset = require('./CountdownScraper/countdown.json');
 const newWorldDataset = require('./dummy.json');
 const paknsaveDataset = require('./pakdummy.json');
 const stringSimilarity = require('string-similarity');
-const mergedData = {};
+const mergedData = [];
 const stores = [];
 let NWUrl = new URL('https://www.newworld.co.nz/next/api/products/search?');
 let PakUrl = new URL('https://www.paknsave.co.nz/next/api/products/search?');
@@ -86,7 +86,7 @@ async function mergeItems() {
                 //console.log(`storeID: ${store.storeID}`);
 
 
-                NWUrl.searchParams.set("q",item1.name);
+                NWUrl.searchParams.set("q",cleanString(item1.name));
                 try {
                     // Delay of 150 ms
                     await new Promise(r => setTimeout(r,150));
@@ -138,7 +138,7 @@ async function mergeItems() {
                 productID = matchedItem.productID;
             } else if ((item1.brand === "fresh fruit") || (item1.brand === "fresh") || (item1.brand === "fresh vegetable")){ // If the barcode does not match and it is a fruit we now search the New World / Paknsave website
                 PakUrl.searchParams.set("storeId",store.storeID);
-                PakUrl.searchParams.set("q",item1.name);
+                PakUrl.searchParams.set("q",cleanString(item1.name));
                 try {
                     // Delay of 150 ms
                     await new Promise(r => setTimeout(r,150));
@@ -181,15 +181,12 @@ async function mergeItems() {
             }
 
         };
-        if (!mergedData[item1.barcode]) {
-            mergedData[item1.barcode] = []
-        };
-        mergedData[item1.barcode].push({
+        mergedData.push({
+            barcode: item1.barcode,
             CountdownName: item1.name,
             NewWorldName: NewWorldName,
             PaknSaveName: PaknSaveName,
             brand: item1.brand,
-            barcode: item1.barcode,
             unit: item1.unit,
             productID: productID,
             countdownProdID: item1.sku,
@@ -212,16 +209,14 @@ async function mergeItems() {
             });
             
             if (!matchedItem) {
-                if (!mergedData[item.barcode]) {
-                    mergedData[item.barcode] = []
-                };
-
-                mergedData[item.barcode].push({
+                mergedData.push(
+                {
+                barcode: item.barcode,
                 CountdownName: null,
                 NewWorldName: NewWorldName,
                 PaknSaveName: null,
                 brand: item.category,
-                barcode: item.barcode,
+                
                 unit: item.quanityType,
                 productID: item.productID,
                 countdownProdID: null,
