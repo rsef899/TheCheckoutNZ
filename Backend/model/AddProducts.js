@@ -4,8 +4,8 @@ async function getData(){
     const db = await MongoObject.client.db("the_checkout_nz");
     const itemsCollection = await db.collection("items");
     const result = await itemsCollection.insertOne({
-        "234534": {
-            "NewWorldName": "Bannana",
+         
+            "NewWorldName": "Rosy",
             "CountdownName": "Fresh BAnanace",
             "PaknSaveName": "fresh fruit bananas yellow",
             "brand": "fresh fruit",
@@ -22,7 +22,7 @@ async function getData(){
                     "nonLoyaltyCardPrice": 543
                 }
         }
-        }
+        
     });
     console.log(result.insertedId)
     MongoObject.client.close();

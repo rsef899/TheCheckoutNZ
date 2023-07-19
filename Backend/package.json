@@ -2,11 +2,11 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "controller/AddProducts.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node model/AddProducts.js",
-    "dev": "nodemon model/AddProducts.js"
+    "start": "node controller/NewWorldScraper/NewWorldScraper.js",
+    "dev": "nodemon controller/NewWorldScraper/NewWorldScraper.js"
   },
   "keywords": [],
   "author": "",

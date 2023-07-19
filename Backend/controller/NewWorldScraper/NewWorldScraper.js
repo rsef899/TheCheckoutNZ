@@ -105,7 +105,7 @@ async function fetchAllItemsOneCategory(category, store){
 async function fetchAllitems(categories, stores){
   
   const MAX_RETRIES = 10;
-  const REQUEST_DELAY_SEP = 150;
+  const REQUEST_DELAY_SEP = 300;
   let itemsAllStores = [];
 
 
@@ -179,13 +179,12 @@ function filterItems(allProducts){
 }
 
 function checkForDupes(allData) {
-  for (let key in allData){
-    let checkingStore = allData[key];
+  for (const store of allData){
 
-    checkingStore.forEach(function(item, index) {
+    store.items.forEach(function(item, index) {
       let count = 0;
       for (let i = index + 1; i < allData.length; i++) {
-        if (item.name === checkingStore[i].name && item.price === checkingStore[i].price && item.quanityType === checkingStore.quanityType) {
+        if (item.name === store.name && item.price === store.price && item.quanityType === checkingStore.quanityType) {
           console.log(`items are ${item.name} , id= ${item.id} and ${checkingStore[i].name}, id= ${acheckingStore[i].id}`)
           count++;
         }
@@ -231,8 +230,8 @@ async function main(){
     let allDataJSON = await fetchAllitems(categories, someStores);
     writeToJson(allDataJSON, 'items.json');
  
-    console.log(allDataJSON["items"].length)
-    console.log(allDataJSON["items"].length)
+    console.log(allDataJSON[0].items.length)
+    console.log(allDataJSON[1].items.length)
 
     checkForDupes(allDataJSON)
   } catch (error){
