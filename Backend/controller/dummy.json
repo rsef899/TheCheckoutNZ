@@ -62,6 +62,14 @@
                 "quanityType": "kg"
             },
             {
+                "productID": "5104350-KGM-000",
+                "category": "Fresh Beef & Lamb",
+                "name": "NZ Beef Mince",
+                "price": 1699,
+                "nonLoyaltyCardPrice": 1699,
+                "quanityType": "kg"
+              },
+            {
                 "productID": "5046917-KGM-000",
                 "category": "Fresh Fruit",
                 "barcode": "9419694065102",
@@ -115,6 +123,14 @@
                 "nonLoyaltyCardPrice": 399,
                 "quanityType": "kg"
             },
+            {
+                "productID": "5104350-KGM-000",
+                "category": "Fresh Beef & Lamb",
+                "name": "NZ Beef Mince",
+                "price": 10000,
+                "nonLoyaltyCardPrice": 1699,
+                "quanityType": "kg"
+              },
             {
                 "productID": "5046525-KGM-000",
                 "category": "Fresh Fruit",
