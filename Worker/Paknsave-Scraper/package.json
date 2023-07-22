@@ -1,19 +1,15 @@
 {
   "name": "paknsave-scraper",
-  "version": "0.0.1",
-  "description": "A Scraper for Paknsave for the 'TheCheckoutNZ' project",
+  "version": "1.0.0",
+  "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+	"scripts": {
+		"start": "tsc index.ts && node ./dist/index.js"
+	},
+  "dependencies": {
+    "fs": "^0.0.1-security"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/rsef899/TheCheckoutNZ.git"
-  },
-  "author": "obwan02",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/rsef899/TheCheckoutNZ/issues"
-  },
-  "homepage": "https://github.com/rsef899/TheCheckoutNZ#readme"
+  "devDependencies": {},
+  "author": "",
+  "license": "ISC"
 }
