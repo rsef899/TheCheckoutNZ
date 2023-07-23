@@ -147,7 +147,7 @@ async function get_items_from_store(store: Store) {
 	let items = categoryItems.flat();
 	console.log(`Found ${items.length} items`)
 
-	const formattedItems = Promise.all(items.map(async (x, i) => {
+	const formattedItems = await Promise.all(items.map(async (x, i) => {
 		await new Promise(resolve => setTimeout(resolve, REQ_INTERVAL * i));
 		return {
 			productID: x.productId,
