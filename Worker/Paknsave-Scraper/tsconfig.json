@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "module": "system",
+    "module": "commonjs",
     "removeComments": true,
     "preserveConstEnums": true,
-    "outFile": "dist/index.js",
+	"outDir": "dist",
     "sourceMap": true
   },
   "include": ["**/*.ts"],

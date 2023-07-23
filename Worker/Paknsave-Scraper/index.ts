@@ -1,6 +1,8 @@
 // Scrape the paknsave API
 import { writeFileSync } from 'fs'
 
+const REQ_INTERVAL = 150; //ms
+
 interface SearchParams {
 	search: string
 	order?: string
@@ -11,6 +13,28 @@ interface SearchParams {
 interface APIError {
 	status: string
 	message: string
+}
+
+interface Store {
+	address: string,
+	banner: string,
+	clickAndCollect: string,
+	defaultCollectType: string,
+	delivery: string,
+	expressTimeslots: string,
+	id: string,
+	latitude: string,
+	linkDetails: string,
+	longitude: string,
+	name: string,
+	onboardingMode: string,
+	onlineActive: string,
+	openingHours: string,
+	phone: string,
+	physicalActive: string,
+	physicalStoreCode: string,
+	region: string,
+	salesOrgId: string
 }
 
 const get_token = (function() {
@@ -68,7 +92,7 @@ async function get_barcode(productId: string, storeId: string) {
 	})
 }
 
-async function get_stores() {
+async function get_stores(): Promise<Store[]> {
 	const token = await get_token();
 	return await fetch("https://api-prod.newworld.co.nz/v1/edge/store", {
 		method: 'GET',
@@ -94,8 +118,8 @@ async function get_categories(storeId: string): Promise<Map<string, number>> {
 }
 
 
-async function get_items_from_store(storeId: string) {
-	const categories = await get_categories(storeId)
+async function get_items_from_store(store: Store) {
+	const categories = await get_categories(store.id)
 
 	const categoryPromises = Object.entries(categories).map(async ([category, numItems], i) => {
 
@@ -104,11 +128,15 @@ async function get_items_from_store(storeId: string) {
 				` retrieve all items. Note, category has ${numItems} items`);
 		}
 
-		await new Promise(resolve => setTimeout(resolve, 150 * i));
-		const items = await get_category_items(category, storeId);
+		await new Promise(resolve => setTimeout(resolve, REQ_INTERVAL * i));
+		const items = await get_category_items(category, store.id);
 
 		if (items.length != numItems) {
 			console.warn(`>>> Expected ${numItems} for category ${category}, but found ${items.length} items`)
+		}
+
+		for (const item of items) {
+			item.category = category
 		}
 
 		return items;
@@ -119,15 +147,38 @@ async function get_items_from_store(storeId: string) {
 	let items = categoryItems.flat();
 	console.log(`Found ${items.length} items`)
 
-	writeFileSync(`out_${storeId}.json`, JSON.stringify(items))
+	const formattedItems = Promise.all(items.map(async (x, i) => {
+		await new Promise(resolve => setTimeout(resolve, REQ_INTERVAL * i));
+		return {
+			productID: x.productId,
+			barcode: (await get_barcode(x.productId, store.id)), // TODO: Fill out 
+			category: x.category,
+			brand: x.brand,
+			name: x.name,
+			price: x.price,
+			nonLoyaltyCardPrice: x.nonLoyaltyCardPrice,
+			quantityType: x.saleType
+		}
+	}));
+
+	const { name, id, latitude, longitude } = store;
+	return {
+		storeName: name,
+		storeID: id,
+		storeLatitude: latitude,
+		storeLongitude: longitude,
+		items: formattedItems
+	}
 }
 
 async function main() {
 	const stores = await get_stores();
 	for (const store of stores) {
 		console.log(`Looking at store ${store.name}`);
-		await get_items_from_store(store.id).catch(console.error);
+		const items = await get_items_from_store(store).catch(console.error);
+		writeFileSync(`out_${store.id}.json`, JSON.stringify(items))
 		console.log(`Finished for store ${store.name}`);
+		return
 	}
 }
 
