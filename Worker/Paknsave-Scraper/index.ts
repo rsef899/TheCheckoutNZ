@@ -1,7 +1,7 @@
 // Scrape the paknsave API
-import { writeFileSync } from 'fs'
-
+import { writeFileSync } from 'fs';
 const REQ_INTERVAL = 150; //ms
+const BARCODE_CACHE = new Map();
 
 interface SearchParams {
 	search: string
@@ -37,12 +37,29 @@ interface Store {
 	salesOrgId: string
 }
 
-const get_token = (function() {
+async function fetch_retry(url: RequestInfo | URL, init?: RequestInit, retries?: number) {
+	retries = retries ?? 5;
+	for (let tries = 0; tries < retries; tries++) {
+		let delay = Math.pow(REQ_INTERVAL, tries);
+		await new Promise(resolve => setTimeout(resolve, delay));
+
+		try {
+			return await fetch(url, init);
+		} catch (err) {
+			console.warn(`(${tries + 1}/${retries}) Failed a request to ${url}, retrying`)
+			if (tries == retries - 1) {
+				throw err;
+			}
+		}
+	}
+}
+
+const get_token = (function () {
 	let curr: any;
 
-	return async function() {
+	return async function () {
 		if (!curr || Date.now() >= curr.expires) {
-			let resp = await fetch("https://www.paknsave.co.nz/CommonApi/Account/GetCurrentUser").then(x => x.json())
+			let resp = await fetch_retry("https://www.paknsave.co.nz/CommonApi/Account/GetCurrentUser").then(x => x.json())
 			curr = {
 				token: resp.access_token,
 				expires: Date.parse(resp.expires_time)
@@ -71,7 +88,7 @@ async function search(storeId: string, {
 		url.searchParams.set("category", category);
 	}
 
-	return await fetch(url).then(r => r.json()).then(j => {
+	return await fetch_retry(url).then(r => r.json()).then(j => {
 		if ('errors' in j) {
 			const errors = j.errors.map((x: APIError) => `'${x.status}: ${x.message}'`).join(", ");
 			throw new Error(`Errors occured: ${errors}`);
@@ -84,17 +101,18 @@ async function search(storeId: string, {
 // TODO: Pre-check the database for existing barcodes
 async function get_barcode(productId: string, storeId: string) {
 	const token = await get_token();
-	await fetch(`https://api-prod.prod.fsniwaikato.kiwi/prod/mobile/store/${storeId}/product/${productId}`, {
+	return await fetch_retry(`https://api-prod.prod.fsniwaikato.kiwi/prod/mobile/store/${storeId}/product/${productId}`, {
 		method: 'GET',
 		headers: {
 			"Authorization": `Bearer: ${token}`
 		}
-	})
+	}).then(x => x.json())
+		.then(x => x?.sku)
 }
 
 async function get_stores(): Promise<Store[]> {
 	const token = await get_token();
-	return await fetch("https://api-prod.newworld.co.nz/v1/edge/store", {
+	return await fetch_retry("https://api-prod.newworld.co.nz/v1/edge/store", {
 		method: 'GET',
 		headers: {
 			'Authorization': `Bearer ${token}`,
@@ -142,24 +160,34 @@ async function get_items_from_store(store: Store) {
 		return items;
 	});
 
-	const categoryItems = await Promise.all(categoryPromises);
-
-	let items = categoryItems.flat();
+	const items = await Promise.all(categoryPromises).then(x => x.flat());
 	console.log(`Found ${items.length} items`)
 
-	const formattedItems = await Promise.all(items.map(async (x, i) => {
-		await new Promise(resolve => setTimeout(resolve, REQ_INTERVAL * i));
-		return {
+	const output = [];
+	for(let i = 0; i < items.length; i++) {
+		const x = items[i];
+
+		let barcode = "";
+		if (BARCODE_CACHE.has(x.productId)) {
+			console.log(`(${i + 1}/${items.length}) Found ${x.name} in cache`)
+			barcode = BARCODE_CACHE.get(x.productId);
+		} else {
+			console.log(`(${i + 1}/${items.length}) Fetching barcode for item ${x.name}`)
+			barcode = await get_barcode(x.productId, store.id);
+			BARCODE_CACHE.set(x.productId, barcode);
+		}
+
+		output.push({
 			productID: x.productId,
-			barcode: (await get_barcode(x.productId, store.id)), // TODO: Fill out 
+			barcode: barcode,
 			category: x.category,
 			brand: x.brand,
 			name: x.name,
 			price: x.price,
 			nonLoyaltyCardPrice: x.nonLoyaltyCardPrice,
 			quantityType: x.saleType
-		}
-	}));
+		})
+	}
 
 	const { name, id, latitude, longitude } = store;
 	return {
@@ -167,7 +195,7 @@ async function get_items_from_store(store: Store) {
 		storeID: id,
 		storeLatitude: latitude,
 		storeLongitude: longitude,
-		items: formattedItems
+		items: output
 	}
 }
 
@@ -176,9 +204,8 @@ async function main() {
 	for (const store of stores) {
 		console.log(`Looking at store ${store.name}`);
 		const items = await get_items_from_store(store).catch(console.error);
-		writeFileSync(`out_${store.id}.json`, JSON.stringify(items))
+		writeFileSync(`out_${store.id}.json`, JSON.stringify(items));
 		console.log(`Finished for store ${store.name}`);
-		return
 	}
 }
 
