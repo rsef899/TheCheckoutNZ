@@ -5,6 +5,8 @@ let numItems = "999";
 let restrictedItemBoolean = false;
 let initialStoreId = "c387ac97-5e0a-43ed-9c93-f1edccda298d";
 
+let timeSinceLastCall = 0;
+
 async function fetchAllStores(){
   let url = "https://www.newworld.co.nz/CommonApi/Store/GetStoreList";
 
@@ -104,8 +106,7 @@ async function fetchAllItemsOneCategory(category, store){
  */
 async function fetchAllitems(categories, stores){
   
-  const MAX_RETRIES = 10;
-  const REQUEST_DELAY_SEP = 300;
+  
   let itemsAllStores = [];
 
 
@@ -113,24 +114,18 @@ async function fetchAllitems(categories, stores){
     stores.map(async (store) =>{
 
       let res = await Promise.all(categories.map(async (cat, index) => {
-        // Setup a delay between initial requests
-
-        await new Promise(resolve => setTimeout(resolve, index * REQUEST_DELAY_SEP));
-        //retry if request has failed
-        let retrySeparation = 1000;
-        for(let i = 0; i < MAX_RETRIES; i++) {
+        
           try {
             console.log(`Sending request for items in category ${cat}`)
-            //return a promise
+            await new Promise(resolve => setTimeout(resolve, 150));
             return await fetchAllItemsOneCategory(cat, store.id);
+
           } catch {
             console.warn(`Failed to fetch items for category ${cat}, retrying (attempt ${i + 2}/${MAX_RETRIES})`)
           }
-          //Set timer for re-request if request failed, promise wait for promise to be resolved
-          await new Promise(resolve => setTimeout(resolve, retrySeparation));
-          //increase retry time
-          retrySeparation *= 2;
-        }
+          
+          
+          
       }));
       //combine all products from all category searches into one array
       //flat combines all into one array
