@@ -85,7 +85,7 @@ async function main() {
     // Finding all items by category (then by pages in each category)
         for (category of categories) {
         const categoryItems = [];
-        categoryName = category;
+        let categoryName = category;
         // Renaming all categories to the name required for requests (& becomes - and removal of capital letters + spaces)
         console.log(`Checking category: ${categoryName}`);
         categoryName = categoryName.replace(/\s+/g, '');
@@ -129,7 +129,25 @@ async function main() {
     }
 
     console.log("Main complete");
+    
     const newArray = listItems.flat().map((item)=> {
+        let specialdentifier = null;
+
+        // if (item.productTag !=null) {
+        //     productTag = "speciaaaal"
+        // }
+
+        if (item.productTag != null){
+            if (item.productTag.tagType == "IsMultiBuy"){
+                specialdentifier = "Multi-buy"
+            }
+        }
+        else if (item.price.isClubPrice == true) {
+             specialdentifier = "Clubcard"    
+        } else {
+            specialdentifier = null
+        }
+
         return{
             // Only choosing to keep certain properties of each item in our list
             name: item.name,
@@ -139,17 +157,10 @@ async function main() {
             sku: item.sku,
             unit: item.unit,
             price: {
+                onSpecial: item.price.isSpecial,
+                specialType: specialdentifier,
+                price: item.price.originalPrice,
                 originalPrice: item.price.originalPrice,
-                salePrice: item.price.salePrice,
-                savePrice: item.price.savePrice,
-                isClubPrice: item.price.isClubPrice,
-                isSpecial: item.price.isSpecial,
-                isNew: item.price.isNew,
-                discount: item.price.discount,
-                total: item.price.total,
-                purchasingUnitPrice: item.price.purchasingUnitPrice,
-                orderedPrice: item.price.orderedPrice,
-
             },
             size: item.size
 
