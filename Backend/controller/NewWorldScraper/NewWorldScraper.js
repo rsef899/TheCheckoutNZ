@@ -110,37 +110,42 @@ async function fetchAllitems(categories, stores){
   let itemsAllStores = [];
 
 
-  await Promise.all(
-    stores.map(async (store) =>{
-
-      let res = await Promise.all(categories.map(async (cat, index) => {
+  for(const store of stores) {
+    for(cat of categories) {
+      let i;
+      for(i = 0; i < 5; i++) {
+        console.log(`Sending request for items in category ${cat}, try (${i+1}/${5})`)
         
-          try {
-            console.log(`Sending request for items in category ${cat}`)
-            await new Promise(resolve => setTimeout(resolve, 150));
-            return await fetchAllItemsOneCategory(cat, store.id);
-
-          } catch {
-            console.warn(`Failed to fetch items for category ${cat}, retrying (attempt ${i + 2}/${MAX_RETRIES})`)
-          }
-          
-          
-          
-      }));
-      //combine all products from all category searches into one array
-      //flat combines all into one array
-      let productsOneCategory = filterItems(res.flatMap(res => res.data.products.map(normaliseItem)));
-      let oneStoreData = {
-        storeName: store.name,
-        storeId: store.id,
-        storeLatitude: store.latitude,
-        storeLongitude: store.longitude,
-        items: productsOneCategory
+        try {
+          itemsAllStores.push(await fetchAllItemsOneCategory(cat, store.id));
+          break;
+        } catch(err) {
+          console.warn(`Failed to fetch items for category ${cat}: ${err}, retrying (attempt)`)
+        }
       }
-      itemsAllStores.push(oneStoreData)
 
-      
-    }));
+      if(i == 5) {
+        throw new Error("Failed 5/5 requests");
+      }
+    }
+  }
+
+
+        
+        
+  
+    //combine all products from all category searches into one array
+    //flat combines all into one array
+    let productsOneCategory = filterItems(res.flatMap(res => res.data.products.map(normaliseItem)));
+    let oneStoreData = {
+      storeName: store.name,
+      storeId: store.id,
+      storeLatitude: store.latitude,
+      storeLongitude: store.longitude,
+      items: productsOneCategory
+    }
+    itemsAllStores.push(oneStoreData)
+
     return itemsAllStores;
     
 
