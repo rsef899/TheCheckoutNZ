@@ -105,16 +105,13 @@ async function fetchAllItemsOneCategory(category, store){
  * @param {Array<String>} categories 
  */
 async function fetchAllitems(categories, stores){
-  
-  
   let itemsAllStores = [];
-
 
   for(const store of stores) {
     for(cat of categories) {
       let i;
       for(i = 0; i < 5; i++) {
-        console.log(`Sending request for items in category ${cat}, try (${i+1}/${5})`)
+        console.log(`Sending request for items in category __${cat}__,store __${store.name}__ try (${i+1}/${5})`)
         
         try {
           itemsAllStores.push(await fetchAllItemsOneCategory(cat, store.id));
@@ -124,15 +121,11 @@ async function fetchAllitems(categories, stores){
         }
       }
 
-      if(i == 5) {
+      if(i == 4) {
         throw new Error("Failed 5/5 requests");
       }
     }
   }
-
-
-        
-        
   
     //combine all products from all category searches into one array
     //flat combines all into one array
