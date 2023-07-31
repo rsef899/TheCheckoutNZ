@@ -106,15 +106,23 @@ async function fetchAllItemsOneCategory(category, store){
  */
 async function fetchAllitems(categories, stores){
   let itemsAllStores = [];
+  let count = 0;
 
   for(const store of stores) {
+    let itemsOneStore  = [];
+    itemsAllStores.push({
+      id : store.id,
+      name:   store.name,
+    });
+    
+    
     for(cat of categories) {
       let i;
       for(i = 0; i < 5; i++) {
         console.log(`Sending request for items in category __${cat}__,store __${store.name}__ try (${i+1}/${5})`)
         
         try {
-          itemsAllStores.push(await fetchAllItemsOneCategory(cat, store.id));
+          itemsOneStore.push(await fetchAllItemsOneCategory(cat, store.id));
           break;
         } catch(err) {
           console.warn(`Failed to fetch items for category ${cat}: ${err}, retrying (attempt)`)
@@ -124,26 +132,15 @@ async function fetchAllitems(categories, stores){
       if(i == 4) {
         throw new Error("Failed 5/5 requests");
       }
+      if (count > 1){
+        console.log(itemsOneStore[0]);
+      }
+      
     }
+    itemsAllStores[count].items = itemsOneStore;
+    count++;
   }
-  
-    //combine all products from all category searches into one array
-    //flat combines all into one array
-    let productsOneCategory = filterItems(res.flatMap(res => res.data.products.map(normaliseItem)));
-    let oneStoreData = {
-      storeName: store.name,
-      storeId: store.id,
-      storeLatitude: store.latitude,
-      storeLongitude: store.longitude,
-      items: productsOneCategory
-    }
-    itemsAllStores.push(oneStoreData)
-
     return itemsAllStores;
-    
-
-  //results is an array of resolved promises, and must await all promises set within it
-
 }
 
 function normaliseItem(item){
@@ -220,7 +217,13 @@ async function main(){
   let someStores = [stores[0], stores[1]];
   console.log(someStores);
   try {
-    let allDataJSON = await fetchAllitems(categories, someStores);
+    let storesWait = await Promise.all([
+      fetchAllitems(categories, [stores[0], stores[1]]),
+      fetchAllitems(categories, [stores[2], stores[3]]),
+      fetchAllitems(categories, [stores[4], stores[5]]),
+    ])
+    console.log(storesWait[0])
+    
     writeToJson(allDataJSON, 'items.json');
  
     console.log(allDataJSON[0].items.length)
