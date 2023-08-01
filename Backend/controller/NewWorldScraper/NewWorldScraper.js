@@ -122,7 +122,9 @@ async function fetchAllitems(categories, stores){
         console.log(`Sending request for items in category __${cat}__,store __${store.name}__ try (${i+1}/${5})`)
         
         try {
-          itemsOneStore.push(await fetchAllItemsOneCategory(cat, store.id));
+          let received = await fetchAllItemsOneCategory(cat, store.id);
+          received  = received .data.products;
+          itemsOneStore.push(received);
           break;
         } catch(err) {
           console.warn(`Failed to fetch items for category ${cat}: ${err}, retrying (attempt)`)
@@ -142,6 +144,8 @@ async function fetchAllitems(categories, stores){
   }
     return itemsAllStores;
 }
+
+
 
 function normaliseItem(item){
   let product = {
@@ -217,19 +221,17 @@ async function main(){
   let someStores = [stores[0], stores[1]];
   console.log(someStores);
   try {
-    let storesWait = await Promise.all([
+    let allDataJSON = await Promise.all([
       fetchAllitems(categories, [stores[0], stores[1]]),
       fetchAllitems(categories, [stores[2], stores[3]]),
       fetchAllitems(categories, [stores[4], stores[5]]),
     ])
-    console.log(storesWait[0])
+    console.log(allDataJSON[0])
     
     writeToJson(allDataJSON, 'items.json');
  
-    console.log(allDataJSON[0].items.length)
-    console.log(allDataJSON[1].items.length)
 
-    checkForDupes(allDataJSON)
+    //checkForDupes(allDataJSON)
   } catch (error){
     console.error(`ERROR: ${error}`)
   }
