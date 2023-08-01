@@ -107,9 +107,10 @@ async function fetchAllItemsOneCategory(category, store){
 async function fetchAllitems(categories, stores){
   let itemsAllStores = [];
   let count = 0;
+  let count1=0;
 
   for(const store of stores) {
-    let itemsOneStore  = [];
+    let itemsOneStore = [];
     itemsAllStores.push({
       id : store.id,
       name:   store.name,
@@ -117,14 +118,20 @@ async function fetchAllitems(categories, stores){
     
     
     for(cat of categories) {
+      count1++;
+      if (count1 == 2 || count1 ==4){
+        console.log("dfklskj")
+        break;
+      }
       let i;
       for(i = 0; i < 5; i++) {
         console.log(`Sending request for items in category __${cat}__,store __${store.name}__ try (${i+1}/${5})`)
         
         try {
           let received = await fetchAllItemsOneCategory(cat, store.id);
-          received  = received .data.products;
-          itemsOneStore.push(received);
+          received.data.products.map((item)=>{
+            itemsOneStore.push(normaliseItem(item))
+          })
           break;
         } catch(err) {
           console.warn(`Failed to fetch items for category ${cat}: ${err}, retrying (attempt)`)
@@ -154,8 +161,12 @@ function normaliseItem(item){
     category: item.category,
     name: item.name,
     price: item.price,
-    nonLoyaltyCardPrice: item.nonLoyaltyCardPrice,
-    quanityType: item.displayName
+    quanityType: item.displayName,
+    //promotions data UNEDITED as per request
+    promotions: item.promotions,
+    promotionList: item.promotionList
+    //TODO: Specials Should be changed
+    //nonLoyaltyCardPrice: item.nonLoyaltyCardPrice,
   };
   
   return product;
@@ -223,8 +234,6 @@ async function main(){
   try {
     let allDataJSON = await Promise.all([
       fetchAllitems(categories, [stores[0], stores[1]]),
-      fetchAllitems(categories, [stores[2], stores[3]]),
-      fetchAllitems(categories, [stores[4], stores[5]]),
     ])
     console.log(allDataJSON[0])
     
