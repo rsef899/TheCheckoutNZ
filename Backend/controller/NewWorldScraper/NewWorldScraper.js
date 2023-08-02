@@ -233,8 +233,10 @@ async function main(){
   console.log(someStores);
   try {
     let allDataJSON = await Promise.all([
-      fetchAllitems(categories, [stores[0], stores[1]]),
+      fetchAllitems(categories, [stores[0], stores[1]])
     ])
+    //concatenate all the store data
+    allDataJSON =  [].concat(...allDataJSON);
     console.log(allDataJSON[0])
     
     writeToJson(allDataJSON, 'items.json');
