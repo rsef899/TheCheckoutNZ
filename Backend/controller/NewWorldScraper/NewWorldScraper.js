@@ -5,8 +5,6 @@ let numItems = "999";
 let restrictedItemBoolean = false;
 let initialStoreId = "c387ac97-5e0a-43ed-9c93-f1edccda298d";
 
-let timeSinceLastCall = 0;
-
 async function fetchAllStores(){
   let url = "https://www.newworld.co.nz/CommonApi/Store/GetStoreList";
 
@@ -121,9 +119,10 @@ async function fetchAllitems(categories, stores){
     
     
     for(cat of categories) {
+      //testing
       if (itemStopperCount == 2){
-        console.log("moving on")
-        break;
+        //console.log("moving on")
+        //break;
       }
       itemStopperCount++;
     
@@ -141,17 +140,14 @@ async function fetchAllitems(categories, stores){
           console.warn(`Failed to fetch items for category ${cat}: ${err}, retrying (attempt)`)
         }
       }
+      // Testing
       if (itemStopperCount == 2){
-        continue;
+        //continue;
       }
 
       if(i == 4) {
         throw new Error("Failed 5/5 requests");
-      }
-      if (count > 1){
-        console.log(itemsOneStore[0]);
-      }
-      
+      } 
     }
     itemsAllStores[count].items = itemsOneStore;
     count++;
@@ -236,7 +232,7 @@ async function main(){
   let categories = getCategories(categoryfetchData);
   let storesFetch = await fetchAllStores();
   let stores = getAllStores(storesFetch);
-  let someStores = [stores[0], stores[1]];
+  let someStores = [stores[0], stores[1], stores[3]];
   console.log(someStores);
   try {
     let allDataJSON = await Promise.all([
@@ -248,8 +244,6 @@ async function main(){
     checkForDupes(allDataJSON)
     writeToJson(allDataJSON, 'items.json');
  
-
-    
   } catch (error){
     console.error(`ERROR: ${error}`)
   }
