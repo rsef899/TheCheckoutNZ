@@ -106,10 +106,13 @@ async function fetchAllItemsOneCategory(category, store){
  */
 async function fetchAllitems(categories, stores){
   let itemsAllStores = [];
+  
   let count = 0;
-  let count1=0;
+
 
   for(const store of stores) {
+    let itemStopperCount = 0;
+
     let itemsOneStore = [];
     itemsAllStores.push({
       id : store.id,
@@ -118,24 +121,28 @@ async function fetchAllitems(categories, stores){
     
     
     for(cat of categories) {
-      count1++;
-      if (count1 == 2 || count1 ==4){
-        console.log("dfklskj")
+      if (itemStopperCount == 2){
+        console.log("moving on")
         break;
       }
+      itemStopperCount++;
+    
       let i;
       for(i = 0; i < 5; i++) {
         console.log(`Sending request for items in category __${cat}__,store __${store.name}__ try (${i+1}/${5})`)
         
         try {
           let received = await fetchAllItemsOneCategory(cat, store.id);
-          received.data.products.map((item)=>{
+          filterItems(received.data.products).map((item)=>{
             itemsOneStore.push(normaliseItem(item))
           })
           break;
         } catch(err) {
           console.warn(`Failed to fetch items for category ${cat}: ${err}, retrying (attempt)`)
         }
+      }
+      if (itemStopperCount == 2){
+        continue;
       }
 
       if(i == 4) {
@@ -233,16 +240,16 @@ async function main(){
   console.log(someStores);
   try {
     let allDataJSON = await Promise.all([
-      fetchAllitems(categories, [stores[0], stores[1]])
+      fetchAllitems(categories, stores)
     ])
     //concatenate all the store data
     allDataJSON =  [].concat(...allDataJSON);
     console.log(allDataJSON[0])
-    
+    checkForDupes(allDataJSON)
     writeToJson(allDataJSON, 'items.json');
  
 
-    //checkForDupes(allDataJSON)
+    
   } catch (error){
     console.error(`ERROR: ${error}`)
   }
